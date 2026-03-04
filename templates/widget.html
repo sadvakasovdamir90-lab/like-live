@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+
+        body {
+            background: transparent;
+            font-family: 'Oswald', sans-serif; /* Оқылуы өте оңай, қалың қаріп */
+            margin: 0;
+            display: flex;
+            align-items: flex-start;
+            height: 100vh;
+        }
+
+        .leaderboard {
+            width: 350px;
+            background: rgba(0, 0, 0, 0.7); /* Мөлдір қара фон */
+            border-left: 10px solid #ffcc00;
+            padding: 15px;
+            margin-top: 50px;
+            box-shadow: 15px 0 30px rgba(0,0,0,0.5);
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
+        }
+
+        .title {
+            color: #ffcc00;
+            font-size: 26px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #ffcc00;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            transition: all 0.3s;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .user-name {
+            color: #fff;
+            font-size: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .user-score {
+            color: #ffcc00;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .rank {
+            color: rgba(255, 204, 0, 0.5);
+            font-size: 14px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="leaderboard">
+        <div class="title">TOP 10 LIKERS 🔥</div>
+        <div id="list">
+            <div style="color: #666;">Waiting for likes...</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        socket.on('update_leaderboard', function(top10) {
+            const listDiv = document.getElementById('list');
+            listDiv.innerHTML = ''; // Тізімді тазарту
+
+            top10.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'user-row';
+                row.innerHTML = `
+                    <div>
+                        <span class="rank">#${index + 1}</span>
+                        <span class="user-name">${item[0]}</span>
+                    </div>
+                    <span class="user-score">${item[1]}</span>
+                `;
+                listDiv.appendChild(row);
+            });
+        });
+    </script>
+</body>
+</html>
