@@ -3,105 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
 
         body {
             background: transparent;
-            font-family: 'Oswald', sans-serif; /* Оқылуы өте оңай, қалың қаріп */
+            font-family: 'Black Ops One', cursive;
             margin: 0;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
 
-        .leaderboard {
-            width: 350px;
-            background: rgba(0, 0, 0, 0.7); /* Мөлдір қара фон */
-            border-left: 10px solid #ffcc00;
-            padding: 15px;
-            margin-top: 50px;
-            box-shadow: 15px 0 30px rgba(0,0,0,0.5);
-            clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
+        .like-card {
+    position: absolute;
+    left: 20px; /* Сол жақтан 20px жылжытып қой */
+    width: 350px;
+    background: rgba(0, 0, 0, 0.8); /* Қара түс анық көрінуі үшін */
+    border-left: 10px solid #ffcc00;
+    padding: 20px;
+    color: white; /* Жазулар ақ түспен */
+}
+
+        .active {
+            transform: translateX(0); /* Лайк келгенде шығады */
         }
 
-        .title {
-            color: #ffcc00;
-            font-size: 26px;
+        .user-label {
+            color: #fff;
+            font-size: 14px;
             text-transform: uppercase;
-            border-bottom: 2px solid #ffcc00;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
             letter-spacing: 2px;
         }
 
-        .user-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 10px;
-            margin-bottom: 5px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-            transition: all 0.3s;
-            animation: slideIn 0.4s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-50px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .user-name {
-            color: #fff;
-            font-size: 20px;
+        .username {
+            color: #ffcc00;
+            font-size: 28px;
+            text-shadow: 2px 2px 5px #000;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 200px;
         }
 
-        .user-score {
-            color: #ffcc00;
-            font-size: 22px;
-            font-weight: bold;
+        .amount-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 24px;
         }
 
-        .rank {
-            color: rgba(255, 204, 0, 0.5);
-            font-size: 14px;
-            margin-right: 10px;
+        .fire-icon {
+            font-size: 30px;
+            animation: bounce 0.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
 <body>
 
-    <div class="leaderboard">
-        <div class="title">TOP 10 LIKERS 🔥</div>
-        <div id="list">
-            <div style="color: #666;">Waiting for likes...</div>
+    <div class="like-card" id="card">
+        <div class="user-label">NEW LIKER</div>
+        <div class="username" id="user">RANDOM USER</div>
+        <div class="amount-box">
+            <span class="fire-icon">🔥</span>
+            <span id="count">x0</span> LIKES
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
         var socket = io();
+        var timer;
 
-        socket.on('update_leaderboard', function(top10) {
-            const listDiv = document.getElementById('list');
-            listDiv.innerHTML = ''; // Тізімді тазарту
+        socket.on('new_like', function(data) {
+            const card = document.getElementById('card');
+            document.getElementById('user').innerText = data.username;
+            document.getElementById('count').innerText = "x" + data.amount;
 
-            top10.forEach((item, index) => {
-                const row = document.createElement('div');
-                row.className = 'user-row';
-                row.innerHTML = `
-                    <div>
-                        <span class="rank">#${index + 1}</span>
-                        <span class="user-name">${item[0]}</span>
-                    </div>
-                    <span class="user-score">${item[1]}</span>
-                `;
-                listDiv.appendChild(row);
-            });
+            // Виджетті көрсету
+            card.classList.add('active');
+
+            // 5 секундтан кейін қайтадан жасырып қою
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                card.classList.remove('active');
+            }, 5000);
         });
     </script>
 </body>
